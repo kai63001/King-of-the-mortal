@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -150,25 +151,61 @@ class _MyHomePageState extends State<MyHomePage> {
       "boom": false,
     },
   ];
-  
+  final genGame = ["right", "left", "up", "down"];
+
+  List<int> genedGame = [];
+  // index ไว้ แสดง quiz ใน array
+  int index = 0;
+  String template = "";
+
+  bool gameStart = false;
+  bool onCheckPress = true;
+
+  int characterPositionX = 0;
+  int characterPositionY = 0;
+  // เดินไปกี่ครั้ง
+  int step = 0;
+
   void startGame() {
     print("game start");
     setState(() {
       gameStart = true;
     });
-    Timer.periodic(new Duration(seconds: 1), (timer) {
-      // debugPrint(timer.tick.toString());
-      setState(() {
-        onCheckPress = false;
-      });
-    });
+    generateGame();
   }
 
-  bool gameStart = false;
+  // สร้าง ด่าน
+  void generateGame() async {
+    // สุ่มว่าจะให้เดินไปทางไหนเก็บเข้าไปใน array
+    for (var i = 0; i < 2; i++) {
+      genedGame.add(Random().nextInt(genGame.length - 1));
+    }
+    print(genedGame);
 
-  bool onCheckPress = true;
-  int characterPositionX = 0;
-  int characterPositionY = 0;
+    // ทำการบอก player ว่าให้เดินไปทางไหนแล้วจำเอา
+    for (var i = 0; i < genedGame.length; i++) {
+      await Future.delayed(Duration(seconds: 1));
+      print(i);
+      setState(() {
+        template = genGame[genedGame[index]].toString();
+        index += 1;
+      });
+      await Future.delayed(Duration(seconds: 2));
+      setState(() {
+        template = "";
+      });
+      if (index == genedGame.length) {
+        startMove();
+      }
+    }
+  }
+
+  void startMove() {
+    template = "GOGOGO";
+    setState(() {
+      onCheckPress = false;
+    });
+  }
 
   // การขยับของผู้เล่น
   void playerMovement(detail) {
@@ -183,26 +220,65 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         characterPositionX += 81;
         onCheckPress = true;
+        checkBomb("right");
       });
     } else if (detail.delta.dx < -sensitivity && characterPositionX > -162) {
       print("left");
       setState(() {
         characterPositionX -= 81;
         onCheckPress = true;
+        checkBomb("left");
       });
     } else if (detail.delta.dy > sensitivity && characterPositionY < 162) {
+      print("down");
       setState(() {
         characterPositionY += 81;
         onCheckPress = true;
+        checkBomb("down");
       });
-      print("down");
     } else if (detail.delta.dy < -sensitivity && characterPositionY > -162) {
       print("up");
       setState(() {
         characterPositionY -= 81;
         onCheckPress = true;
+        checkBomb("up");
       });
     }
+  }
+
+  void checkBomb(move) async {
+    await Future.delayed(Duration(seconds: 1));
+    if (step == genedGame.length - 1) {
+      gameOver();
+      return;
+    }
+    print(move);
+    print(genGame[genedGame[step]]);
+    if (move == genGame[genedGame[step]]) {
+      startMove();
+      setState(() {
+        step += 1;
+      });
+    } else {
+      setState(() {
+        template = "noob";
+      });
+    }
+  }
+
+  void gameOver() {
+    setState(() {
+      gameStart = false;
+      genedGame = [];
+      index = 0;
+      template = "";
+
+      onCheckPress = true;
+
+      characterPositionX = 0;
+      characterPositionY = 0;
+      step = 0;
+    });
   }
 
   @override
@@ -219,6 +295,13 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: Stack(
           children: [
+            Positioned(
+              child: Container(
+                  width: size.width,
+                  child:
+                      gameStart ? Center(child: Text("$template")) : Text("")),
+              top: (size.height * 0.05),
+            ),
             Padding(
               padding: const EdgeInsets.all(5.0),
               child: Center(
@@ -278,6 +361,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // widget card ระเบิด
   Container cardBoom(item) {
     return Container(
-        decoration: BoxDecoration(color: Colors.blue), child: Text("${item['index']}"));
+        decoration: BoxDecoration(color: Colors.blue),
+        child: Text("${item['index']}"));
   }
 }
