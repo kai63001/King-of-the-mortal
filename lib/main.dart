@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,12 +13,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Motal Game',
+      title: 'King of the mortal',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: MyHomePage(title: 'Motal Game'),
+      home: MyHomePage(title: ''),
     );
   }
 }
@@ -264,6 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void flipCard() async {
+    await Future.delayed(Duration(seconds: 1));
     for (int i = 0; i < data.length; i++) {
       cardKeys[i]?.currentState?.toggleCard();
     }
@@ -307,110 +309,178 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: Text("MOTAL GAME"),
-        elevation: 0,
-      ),
-      body: GestureDetector(
-        onTap: () {
-          print("tappp");
-        },
-        onPanUpdate: (detail) {
-          playerMovement(detail);
-        },
-        child: Stack(
-          children: [
-            Positioned(
-              child: Container(
-                  width: size.width,
-                  child:
-                      gameStart ? Center(child: Text("$template")) : Text("")),
-              top: (size.height * 0.05),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Center(
+      body: SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            print("tappp");
+          },
+          onPanUpdate: (detail) {
+            playerMovement(detail);
+          },
+          child: Stack(
+            children: [
+              Positioned(
                 child: Container(
-                  width: 400,
-                  height: 400,
-                  key: _stickyKey,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      GridView.builder(
-                        // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: data.length,
-                        itemBuilder: (context, index) {
-                          cardKeys.putIfAbsent(
-                              index, () => GlobalKey<FlipCardState>());
-                          GlobalKey<FlipCardState>? thisCard = cardKeys[index];
-                          return FlipCard(
-                            flipOnTouch: false,
-                            direction: FlipDirection.HORIZONTAL,
-                            key: thisCard,
-                            front: Container(
-                              decoration:
-                                  BoxDecoration(color: Colors.blueAccent),
-                              child: Text('Front'),
-                            ),
-                            back: Container(
-                              decoration: BoxDecoration(color: Colors.red),
-                              child: Text('Back'),
-                            ),
-                          );
-                        },
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 5,
-                            crossAxisSpacing: 5,
-                            mainAxisSpacing: 5),
-                      ),
-                      _stickyKey.currentContext != null
-                          ? Positioned(
-                              child: Container(
-                                  transform: Matrix4.translationValues(
-                                      -(sizeGrid.size.width * 0.05),
-                                      -(sizeGrid.size.height * 0.04),
-                                      0.0),
-                                  decoration: BoxDecoration(color: Colors.red),
-                                  width: sizeGrid.size.width * 0.1,
-                                  height: sizeGrid.size.width * 0.1,
-                                  child: Text("")),
-                              left: characterPositionX +
-                                  (sizeGrid.size.width * 0.5),
-                              top: characterPositionY +
-                                  (sizeGrid.size.width * 0.49),
-                            )
-                          : Text("")
-                    ],
+                    width: size.width,
+                    child: gameStart
+                        ? Center(child: Text("$template"))
+                        : Text("")),
+                top: (size.height * 0.05),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Center(
+                  child: Container(
+                    width: 400,
+                    height: 400,
+                    key: _stickyKey,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        GridView.builder(
+                          // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            cardKeys.putIfAbsent(
+                                index, () => GlobalKey<FlipCardState>());
+                            GlobalKey<FlipCardState>? thisCard =
+                                cardKeys[index];
+                            return FlipCard(
+                              flipOnTouch: false,
+                              direction: FlipDirection.HORIZONTAL,
+                              key: thisCard,
+                              front: Container(
+                                decoration:
+                                    BoxDecoration(color: Colors.blueAccent),
+                                child: Text('Front'),
+                              ),
+                              back: Container(
+                                decoration: BoxDecoration(color: Colors.red),
+                                child: Text('Back'),
+                              ),
+                            );
+                          },
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5,
+                                  crossAxisSpacing: 5,
+                                  mainAxisSpacing: 5),
+                        ),
+                        _stickyKey.currentContext != null
+                            ? Positioned(
+                                child: Container(
+                                    transform: Matrix4.translationValues(
+                                        -(sizeGrid.size.width * 0.05),
+                                        -(sizeGrid.size.height * 0.04),
+                                        0.0),
+                                    decoration:
+                                        BoxDecoration(color: Colors.red),
+                                    width: sizeGrid.size.width * 0.1,
+                                    height: sizeGrid.size.width * 0.1,
+                                    child: Text("")),
+                                left: characterPositionX +
+                                    (sizeGrid.size.width * 0.5),
+                                top: characterPositionY +
+                                    (sizeGrid.size.width * 0.49),
+                              )
+                            : Text("")
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            !gameStart
-                ? Container(
-                    width: size.width,
-                    height: size.height,
-                    decoration: BoxDecoration(color: Colors.black),
-                    child: Center(
-                        child: GestureDetector(
-                      onTap: () {
-                        startGame();
-                      },
-                      child: Container(
-                          decoration: BoxDecoration(color: Colors.red),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "START GAME",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          )),
-                    )))
-                : Text(""),
-          ],
+              !gameStart ? menuGame(size) : Text(""),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  Container menuGame(Size size) {
+    return Container(
+        width: size.width,
+        height: size.height,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.lightBlue,
+            Colors.blue,
+          ],
+        )),
+        child: ListView(
+          children: [
+            Container(
+              height: size.height * 0.1,
+            ),
+            Container(
+              height: size.height * 0.3,
+              child: Image.asset(
+                'assets/images/king.png',
+              ),
+            ),
+            Container(
+              height: size.height * 0.1,
+            ),
+            Center(
+              child: Container(
+                width: size.width * 0.8,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "King of the mortal",
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.fredokaOne(
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 35)),
+                    ),
+                    Text(
+                      "Memorise the arrows shown each round and move to dodge the explosions",
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.fredokaOne(
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 15)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: size.height * 0.05,
+            ),
+            Center(
+                child: GestureDetector(
+              onTap: () {
+                startGame();
+              },
+              child: Container(
+                  width: size.width * 0.8,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 3,
+                        blurRadius: 10,
+                        offset: Offset(0, 5), // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      "START GAME",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.fredokaOne(
+                          textStyle: TextStyle(color: Colors.blue)),
+                    ),
+                  )),
+            )),
+          ],
+        ));
   }
 }
