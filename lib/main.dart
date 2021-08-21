@@ -142,12 +142,16 @@ class _MyHomePageState extends State<MyHomePage> {
   bool gameStart = false;
   bool onCheckPress = true;
 
-  int characterPositionX = 0;
-  int characterPositionY = 0;
+  double characterPositionX = 0;
+  double characterPositionY = 0;
   // เดินไปกี่ครั้ง
   int step = 0;
 
+  // resiponsive
   final _stickyKey = GlobalKey();
+  late final RenderBox sizeGrid;
+  double staticMoveX = 0.0;
+  double staticMoveY = 0.0;
 
   void startGame() {
     print("game start");
@@ -161,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void generateGame() async {
     // สุ่มว่าจะให้เดินไปทางไหนเก็บเข้าไปใน array
     for (var i = 0; i < 2; i++) {
-      genedGame.add(Random().nextInt(genGame.length - 1));
+      genedGame.add(Random().nextInt(genGame.length));
     }
     print(genedGame);
 
@@ -190,39 +194,38 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  // การขยับของผู้เล่น
+  // การขยับของผู้เล่น โดยการสบัดนิ้ว (swipe)
   void playerMovement(detail) {
-    int sensitivity = 8;
-    print(onCheckPress);
+    int sensitivity = 6;
+    // print(onCheckPress);
     if (onCheckPress == true) {
       return;
     }
-    print(characterPositionX);
     if (detail.delta.dx > sensitivity && characterPositionX < 162) {
-      print("right");
+      // print("right");
       setState(() {
-        characterPositionX += 81;
+        characterPositionX += staticMoveX;
         onCheckPress = true;
         checkBomb("right");
       });
     } else if (detail.delta.dx < -sensitivity && characterPositionX > -162) {
-      print("left");
+      // print("left");
       setState(() {
-        characterPositionX -= 81;
+        characterPositionX -= staticMoveX;
         onCheckPress = true;
         checkBomb("left");
       });
     } else if (detail.delta.dy > sensitivity && characterPositionY < 162) {
-      print("down");
+      // print("down");
       setState(() {
-        characterPositionY += 81;
+        characterPositionY += staticMoveY;
         onCheckPress = true;
         checkBomb("down");
       });
     } else if (detail.delta.dy < -sensitivity && characterPositionY > -162) {
-      print("up");
+      // print("up");
       setState(() {
-        characterPositionY -= 81;
+        characterPositionY -= staticMoveY;
         onCheckPress = true;
         checkBomb("up");
       });
@@ -268,6 +271,21 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback(_afterLayout);
+    super.initState();
+  }
+
+  _afterLayout(_) {
+    setState(() {
+      sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox;
+      staticMoveX = sizeGrid.size.width * 0.2;
+      staticMoveY = sizeGrid.size.width * 0.2;
+    });
+    print(sizeGrid.size);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -294,11 +312,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   width: 400,
                   height: 400,
+                  key: _stickyKey,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
                       GridView.count(
-                        key: _stickyKey,
                         crossAxisSpacing: 5,
                         mainAxisSpacing: 5,
                         crossAxisCount: 5,
@@ -308,35 +326,28 @@ class _MyHomePageState extends State<MyHomePage> {
                           for (var item in data) cardBoom(item)
                         ],
                       ),
-                      Positioned(
-                        child: Container(
-                            transform:
-                                Matrix4.translationValues(-25.0, -18.0, 0.0),
-                            decoration: BoxDecoration(color: Colors.red),
-                            width: 50,
-                            height: 50,
-                            child: Text("")),
-                        left: characterPositionX +
-                            (double.parse(
-                                    _stickyKey.currentContext!.size!.width.toString()) *
-                                0.32),
-                        top: characterPositionY + (size.height * 0.52),
-                      ),
+                      _stickyKey.currentContext != null
+                          ? Positioned(
+                              child: Container(
+                                  transform: Matrix4.translationValues(
+                                      -(sizeGrid.size.width * 0.05),
+                                      -(sizeGrid.size.height * 0.04),
+                                      0.0),
+                                  decoration: BoxDecoration(color: Colors.red),
+                                  width: sizeGrid.size.width * 0.1,
+                                  height: sizeGrid.size.width * 0.1,
+                                  child: Text("")),
+                              left: characterPositionX +
+                                  (sizeGrid.size.width * 0.5),
+                              top: characterPositionY +
+                                  (sizeGrid.size.width * 0.49),
+                            )
+                          : Text("")
                     ],
                   ),
                 ),
               ),
             ),
-            // Positioned(
-            //   child: Container(
-            //       transform: Matrix4.translationValues(-25.0, -18.0, 0.0),
-            //       decoration: BoxDecoration(color: Colors.red),
-            //       width: 50,
-            //       height: 50,
-            //       child: Text("")),
-            //   left: characterPositionX + (size.width / 2),
-            //   top: characterPositionY + (size.height * 0.45),
-            // ),
             !gameStart
                 ? Container(
                     width: size.width,
