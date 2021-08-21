@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -153,6 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
   double staticMoveX = 0.0;
   double staticMoveY = 0.0;
 
+  //flip card
+  var cardKeys = Map<int, GlobalKey<FlipCardState>>();
+  GlobalKey<FlipCardState>? lastFlipped;
+
   void startGame() {
     print("game start");
     setState(() {
@@ -201,6 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (onCheckPress == true) {
       return;
     }
+    print(detail.delta.dy);
     if (detail.delta.dx > sensitivity && characterPositionX < 162) {
       // print("right");
       setState(() {
@@ -216,14 +222,14 @@ class _MyHomePageState extends State<MyHomePage> {
         checkBomb("left");
       });
     } else if (detail.delta.dy > sensitivity && characterPositionY < 162) {
-      // print("down");
+      print("down");
       setState(() {
         characterPositionY += staticMoveY;
         onCheckPress = true;
         checkBomb("down");
       });
     } else if (detail.delta.dy < -sensitivity && characterPositionY > -162) {
-      // print("up");
+      print("up");
       setState(() {
         characterPositionY -= staticMoveY;
         onCheckPress = true;
@@ -233,7 +239,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void checkBomb(move) async {
-    await Future.delayed(Duration(seconds: 1));
+    flipCard();
+    await Future.delayed(Duration(seconds: 2));
     print(move);
     print(genGame[genedGame[step]]);
     if (move == genGame[genedGame[step]]) {
@@ -254,6 +261,17 @@ class _MyHomePageState extends State<MyHomePage> {
         template = "noob";
       });
     }
+  }
+
+  void flipCard() async {
+    for (int i = 0; i < data.length; i++) {
+      cardKeys[i]?.currentState?.toggleCard();
+    }
+    await Future.delayed(Duration(seconds: 1));
+    for (int i = 0; i < data.length; i++) {
+      cardKeys[i]?.currentState?.toggleCard();
+    }
+    return;
   }
 
   void gameOver() {
@@ -294,6 +312,9 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
       ),
       body: GestureDetector(
+        onTap: () {
+          print("tappp");
+        },
         onPanUpdate: (detail) {
           playerMovement(detail);
         },
@@ -316,15 +337,33 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      GridView.count(
-                        crossAxisSpacing: 5,
-                        mainAxisSpacing: 5,
-                        crossAxisCount: 5,
+                      GridView.builder(
+                        // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
                         physics: NeverScrollableScrollPhysics(),
-                        children: [
-                          // ทำการ loop card ระเบิด
-                          for (var item in data) cardBoom(item)
-                        ],
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          cardKeys.putIfAbsent(
+                              index, () => GlobalKey<FlipCardState>());
+                          GlobalKey<FlipCardState>? thisCard = cardKeys[index];
+                          return FlipCard(
+                            flipOnTouch: false,
+                            direction: FlipDirection.HORIZONTAL,
+                            key: thisCard,
+                            front: Container(
+                              decoration:
+                                  BoxDecoration(color: Colors.blueAccent),
+                              child: Text('Front'),
+                            ),
+                            back: Container(
+                              decoration: BoxDecoration(color: Colors.red),
+                              child: Text('Back'),
+                            ),
+                          );
+                        },
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 5,
+                            crossAxisSpacing: 5,
+                            mainAxisSpacing: 5),
                       ),
                       _stickyKey.currentContext != null
                           ? Positioned(
@@ -373,12 +412,5 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
-  }
-
-  // widget card ระเบิด
-  Container cardBoom(item) {
-    return Container(
-        decoration: BoxDecoration(color: Colors.blue),
-        child: Text("${item['index']}"));
   }
 }
