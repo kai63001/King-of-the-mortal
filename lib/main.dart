@@ -129,28 +129,9 @@ class _MyHomePageState extends State<MyHomePage> {
     {
       "index": 24,
       "boom": false,
-    },
-    {
-      "index": 25,
-      "boom": false,
-    },
-    {
-      "index": 26,
-      "boom": false,
-    },
-    {
-      "index": 27,
-      "boom": false,
-    },
-    {
-      "index": 28,
-      "boom": false,
-    },
-    {
-      "index": 29,
-      "boom": false,
-    },
+    }
   ];
+
   final genGame = ["right", "left", "up", "down"];
 
   List<int> genedGame = [];
@@ -165,6 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int characterPositionY = 0;
   // เดินไปกี่ครั้ง
   int step = 0;
+
+  final _stickyKey = GlobalKey();
 
   void startGame() {
     print("game start");
@@ -195,13 +178,13 @@ class _MyHomePageState extends State<MyHomePage> {
         template = "";
       });
       if (index == genedGame.length) {
+        template = "GOGOGO";
         startMove();
       }
     }
   }
 
   void startMove() {
-    template = "GOGOGO";
     setState(() {
       onCheckPress = false;
     });
@@ -248,18 +231,22 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void checkBomb(move) async {
     await Future.delayed(Duration(seconds: 1));
-    if (step == genedGame.length - 1) {
-      gameOver();
-      return;
-    }
     print(move);
     print(genGame[genedGame[step]]);
     if (move == genGame[genedGame[step]]) {
-      startMove();
       setState(() {
+        template = "nice";
         step += 1;
       });
+      if (step == genedGame.length) {
+        setState(() {
+          template = "let go ";
+        });
+        return;
+      }
+      startMove();
     } else {
+      gameOver();
       setState(() {
         template = "noob";
       });
@@ -272,13 +259,12 @@ class _MyHomePageState extends State<MyHomePage> {
       genedGame = [];
       index = 0;
       template = "";
-
       onCheckPress = true;
-
       characterPositionX = 0;
       characterPositionY = 0;
       step = 0;
     });
+    print("game over");
   }
 
   @override
@@ -308,29 +294,49 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   width: 400,
                   height: 400,
-                  child: GridView.count(
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                    crossAxisCount: 5,
-                    physics: NeverScrollableScrollPhysics(),
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      // ทำการ loop card ระเบิด
-                      for (var item in data) cardBoom(item)
+                      GridView.count(
+                        key: _stickyKey,
+                        crossAxisSpacing: 5,
+                        mainAxisSpacing: 5,
+                        crossAxisCount: 5,
+                        physics: NeverScrollableScrollPhysics(),
+                        children: [
+                          // ทำการ loop card ระเบิด
+                          for (var item in data) cardBoom(item)
+                        ],
+                      ),
+                      Positioned(
+                        child: Container(
+                            transform:
+                                Matrix4.translationValues(-25.0, -18.0, 0.0),
+                            decoration: BoxDecoration(color: Colors.red),
+                            width: 50,
+                            height: 50,
+                            child: Text("")),
+                        left: characterPositionX +
+                            (double.parse(
+                                    _stickyKey.currentContext!.size!.width.toString()) *
+                                0.32),
+                        top: characterPositionY + (size.height * 0.52),
+                      ),
                     ],
                   ),
                 ),
               ),
             ),
-            Positioned(
-              child: Container(
-                  transform: Matrix4.translationValues(-25.0, -18.0, 0.0),
-                  decoration: BoxDecoration(color: Colors.red),
-                  width: 50,
-                  height: 50,
-                  child: Text("")),
-              left: characterPositionX + (size.width / 2),
-              top: characterPositionY + (size.height * 0.45),
-            ),
+            // Positioned(
+            //   child: Container(
+            //       transform: Matrix4.translationValues(-25.0, -18.0, 0.0),
+            //       decoration: BoxDecoration(color: Colors.red),
+            //       width: 50,
+            //       height: 50,
+            //       child: Text("")),
+            //   left: characterPositionX + (size.width / 2),
+            //   top: characterPositionY + (size.height * 0.45),
+            // ),
             !gameStart
                 ? Container(
                     width: size.width,
