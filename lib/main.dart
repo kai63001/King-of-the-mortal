@@ -457,7 +457,7 @@ class _MyHomePageState extends State<MyHomePage> {
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
-                  color: Colors.black,
+                  color: Colors.red,
                   width: 5,
                 ),
                 boxShadow: [
@@ -472,7 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Center(
               child: Image.asset(
                 "assets/images/question-mark.png",
-                color: Colors.black,
+                color: Colors.red,
                 width: 25,
               ),
             ),
