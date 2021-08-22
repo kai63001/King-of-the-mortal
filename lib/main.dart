@@ -5,6 +5,8 @@ import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'dart:math' as Math;
+
 void main() {
   runApp(MyApp());
 }
@@ -249,9 +251,13 @@ class _MyHomePageState extends State<MyHomePage> {
         template = "nice";
         step += 1;
       });
+      await Future.delayed(Duration(milliseconds: 500));
+      setState(() {
+        template = "";
+      });
       if (step == genedGame.length) {
         setState(() {
-          template = "let go ";
+          template = "letgo";
         });
         return;
       }
@@ -309,6 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: Colors.lightBlueAccent,
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -319,14 +326,7 @@ class _MyHomePageState extends State<MyHomePage> {
           },
           child: Stack(
             children: [
-              Positioned(
-                child: Container(
-                    width: size.width,
-                    child: gameStart
-                        ? Center(child: Text("$template"))
-                        : Text("")),
-                top: (size.height * 0.05),
-              ),
+              arrowQuiz(size),
               Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Center(
@@ -337,53 +337,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        GridView.builder(
-                          // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: data.length,
-                          itemBuilder: (context, index) {
-                            cardKeys.putIfAbsent(
-                                index, () => GlobalKey<FlipCardState>());
-                            GlobalKey<FlipCardState>? thisCard =
-                                cardKeys[index];
-                            return FlipCard(
-                              flipOnTouch: false,
-                              direction: FlipDirection.HORIZONTAL,
-                              key: thisCard,
-                              front: Container(
-                                decoration:
-                                    BoxDecoration(color: Colors.blueAccent),
-                                child: Text('Front'),
-                              ),
-                              back: Container(
-                                decoration: BoxDecoration(color: Colors.red),
-                                child: Text('Back'),
-                              ),
-                            );
-                          },
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 5,
-                                  crossAxisSpacing: 5,
-                                  mainAxisSpacing: 5),
-                        ),
+                        cardBoomm(),
                         _stickyKey.currentContext != null
-                            ? Positioned(
-                                child: Container(
-                                    transform: Matrix4.translationValues(
-                                        -(sizeGrid.size.width * 0.05),
-                                        -(sizeGrid.size.height * 0.04),
-                                        0.0),
-                                    decoration:
-                                        BoxDecoration(color: Colors.red),
-                                    width: sizeGrid.size.width * 0.1,
-                                    height: sizeGrid.size.width * 0.1,
-                                    child: Text("")),
-                                left: characterPositionX +
-                                    (sizeGrid.size.width * 0.5),
-                                top: characterPositionY +
-                                    (sizeGrid.size.width * 0.49),
-                              )
+                            ? playerGame()
                             : Text("")
                       ],
                     ),
@@ -395,6 +351,136 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+    );
+  }
+
+  // Player
+  Positioned playerGame() {
+    return Positioned(
+      child: Container(
+          transform: Matrix4.translationValues(-(sizeGrid.size.width * 0.05),
+              -(sizeGrid.size.height * 0.04), 0.0),
+          decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.all(Radius.circular(3))),
+          width: sizeGrid.size.width * 0.1,
+          height: sizeGrid.size.width * 0.1,
+          child: Text("")),
+      left: characterPositionX + (sizeGrid.size.width * 0.5),
+      top: characterPositionY + (sizeGrid.size.width * 0.49),
+    );
+  }
+
+  // ลูกศร และ ui ต่างๆบนหัว
+  Positioned arrowQuiz(Size size) {
+    double calAnge = template == "right"
+        ? Math.pi / 2
+        : template == "left"
+            ? Math.pi / -2
+            : template == "up"
+                ? 0
+                : template == "down"
+                    ? -Math.pi
+                    : Math.pi * 1;
+    return Positioned(
+      child: Container(
+          width: size.width,
+          child: gameStart
+              ? Center(
+                  child: template == "up" ||
+                          template == "down" ||
+                          template == "left" ||
+                          template == "right"
+                      ? Transform.rotate(
+                          angle: calAnge,
+                          child: Image.asset(
+                            "assets/images/up-arrow.png",
+                            width: 50,
+                          ))
+                      : template == "nice"
+                          ? Image.asset(
+                              "assets/images/like.png",
+                              width: 50,
+                            )
+                          : template == "GOGOGO"
+                              ? Image.asset("assets/images/start-button.png",
+                                  width: 80)
+                              : template == "letgo"
+                                  ? Image.asset(
+                                      "assets/images/crown.png",
+                                      width: 80,
+                                    )
+                                  : Text("$template"))
+              : Text("")),
+      top: (size.height * 0.05),
+    );
+  }
+
+  // Card แสดง ระเบิด
+  GridView cardBoomm() {
+    return GridView.builder(
+      // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: data.length,
+      itemBuilder: (context, index) {
+        cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
+        GlobalKey<FlipCardState>? thisCard = cardKeys[index];
+        return FlipCard(
+          flipOnTouch: false,
+          direction: FlipDirection.HORIZONTAL,
+          key: thisCard,
+          front: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: Colors.blue,
+                  width: 5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+                borderRadius: BorderRadius.all(Radius.circular(3))),
+            child: Center(
+              child: Image.asset(
+                "assets/images/question-mark.png",
+                color: Colors.blue,
+                width: 25,
+              ),
+            ),
+          ),
+          back: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(
+                  color: Colors.black,
+                  width: 5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: Offset(0, 0), // changes position of shadow
+                  ),
+                ],
+                borderRadius: BorderRadius.all(Radius.circular(3))),
+            child: Center(
+              child: Image.asset(
+                "assets/images/question-mark.png",
+                color: Colors.black,
+                width: 25,
+              ),
+            ),
+          ),
+        );
+      },
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 5, crossAxisSpacing: 5, mainAxisSpacing: 5),
     );
   }
 
