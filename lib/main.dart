@@ -161,6 +161,10 @@ class _MyHomePageState extends State<MyHomePage> {
   var cardKeys = Map<int, GlobalKey<FlipCardState>>();
   GlobalKey<FlipCardState>? lastFlipped;
 
+  //แก้ bug แกน x y
+  int x = 0;
+  int y = 0;
+
   void startGame() {
     print("game start");
     setState(() {
@@ -169,18 +173,78 @@ class _MyHomePageState extends State<MyHomePage> {
     generateGame();
   }
 
+  //check it
+  void checkOutOfCard() {
+    // 0 = ขวา
+    // 1 = ซ้าย
+    // 2 = ขึ้น
+    // 3 = ลง
+    int random = Random().nextInt(genGame.length);
+    // แก้บัคโดยการ ถ้า แกน x หรือ แกน y ออกนอกที่กำหนดแล้วจะให้ทำตรงกันข้าม
+    switch (random) {
+      case 0:
+        setState(() {
+          x += 1;
+        });
+        if (x > 2) {
+          setState(() {
+            random = 1;
+            x -= 2;
+          });
+        }
+        break;
+      case 1:
+        setState(() {
+          x -= 1;
+        });
+        if (x < -2) {
+          setState(() {
+            random = 0;
+            x += 2;
+          });
+        }
+        break;
+      case 2:
+        setState(() {
+          y -= 1;
+        });
+        if (y < -2) {
+          setState(() {
+            random = 3;
+            y += 2;
+          });
+        }
+        break;
+      case 3:
+        setState(() {
+          y += 1;
+        });
+        if (y > 2) {
+          setState(() {
+            random = 2;
+            y -= 2;
+          });
+        }
+        break;
+    }
+    print("x = $x");
+    print("y = $y");
+    genedGame.add(random);
+    return;
+  }
+
   // สร้าง ด่าน
   void generateGame() async {
     // สุ่มว่าจะให้เดินไปทางไหนเก็บเข้าไปใน array
-    for (var i = 0; i < 2; i++) {
-      genedGame.add(Random().nextInt(genGame.length));
+    for (var i = 0; i < 20; i++) {
+      checkOutOfCard();
     }
     print(genedGame);
 
     // ทำการบอก player ว่าให้เดินไปทางไหนแล้วจำเอา
     for (var i = 0; i < genedGame.length; i++) {
       await Future.delayed(Duration(seconds: 1));
-      print(i);
+      print(genGame[genedGame[i]]);
       setState(() {
         template = genGame[genedGame[index]].toString();
         index += 1;
@@ -209,29 +273,33 @@ class _MyHomePageState extends State<MyHomePage> {
     if (onCheckPress == true) {
       return;
     }
-    print(detail.delta.dy);
-    if (detail.delta.dx > sensitivity && characterPositionX < 162) {
+    // print(detail.delta.dy);
+    if (detail.delta.dx > sensitivity &&
+        characterPositionX < (staticMoveX * 2)) {
       // print("right");
       setState(() {
         characterPositionX += staticMoveX;
         onCheckPress = true;
         checkBomb("right");
       });
-    } else if (detail.delta.dx < -sensitivity && characterPositionX > -162) {
+    } else if (detail.delta.dx < -sensitivity &&
+        characterPositionX > -(staticMoveX * 2)) {
       // print("left");
       setState(() {
         characterPositionX -= staticMoveX;
         onCheckPress = true;
         checkBomb("left");
       });
-    } else if (detail.delta.dy > sensitivity && characterPositionY < 162) {
+    } else if (detail.delta.dy > sensitivity &&
+        characterPositionY < (staticMoveY * 2)) {
       print("down");
       setState(() {
         characterPositionY += staticMoveY;
         onCheckPress = true;
         checkBomb("down");
       });
-    } else if (detail.delta.dy < -sensitivity && characterPositionY > -162) {
+    } else if (detail.delta.dy < -sensitivity &&
+        characterPositionY > -(staticMoveY * 2)) {
       print("up");
       setState(() {
         characterPositionY -= staticMoveY;
@@ -292,6 +360,8 @@ class _MyHomePageState extends State<MyHomePage> {
       characterPositionX = 0;
       characterPositionY = 0;
       step = 0;
+      x = 0;
+      y = 0;
     });
     print("game over");
   }
@@ -318,9 +388,6 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Colors.lightBlueAccent,
       body: SafeArea(
         child: GestureDetector(
-          onTap: () {
-            print("tappp");
-          },
           onPanUpdate: (detail) {
             playerMovement(detail);
           },
@@ -465,7 +532,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.black.withOpacity(0.2),
                     spreadRadius: 1,
                     blurRadius: 1,
-                    offset: Offset(0, 0), // changes position of shadow
+                    offset: Offset(0, 0),
                   ),
                 ],
                 borderRadius: BorderRadius.all(Radius.circular(3))),
@@ -553,7 +620,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         color: Colors.black.withOpacity(0.2),
                         spreadRadius: 3,
                         blurRadius: 10,
-                        offset: Offset(0, 5), // changes position of shadow
+                        offset: Offset(0, 5),
                       ),
                     ],
                   ),
