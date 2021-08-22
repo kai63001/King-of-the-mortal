@@ -151,6 +151,9 @@ class _MyHomePageState extends State<MyHomePage> {
   // เดินไปกี่ครั้ง
   int step = 0;
 
+  //ระดับ
+  int level = 1;
+
   // resiponsive
   final _stickyKey = GlobalKey();
   late final RenderBox sizeGrid;
@@ -169,6 +172,10 @@ class _MyHomePageState extends State<MyHomePage> {
     print("game start");
     setState(() {
       gameStart = true;
+      genedGame = [];
+      index = 0;
+      step = 0;
+      level += 1;
     });
     generateGame();
   }
@@ -235,8 +242,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // สร้าง ด่าน
   void generateGame() async {
-    // สุ่มว่าจะให้เดินไปทางไหนเก็บเข้าไปใน array
-    for (var i = 0; i < 20; i++) {
+    // สุ่มว่าจะให้เดินไปทางไหนเก็บเข้าไปใน array + level
+    for (var i = 0; i < level; i++) {
       checkOutOfCard();
     }
     print(genedGame);
@@ -327,6 +334,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           template = "letgo";
         });
+        startGame();
         return;
       }
       startMove();
@@ -350,6 +358,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return;
   }
 
+  //แพ้
   void gameOver() {
     setState(() {
       gameStart = false;
@@ -362,6 +371,7 @@ class _MyHomePageState extends State<MyHomePage> {
       step = 0;
       x = 0;
       y = 0;
+      level = 1;
     });
     print("game over");
   }
