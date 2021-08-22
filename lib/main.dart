@@ -407,7 +407,7 @@ class _MyHomePageState extends State<MyHomePage> {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.lightBlue,
+            Colors.lightBlueAccent,
             Colors.blue,
           ],
         )),
@@ -460,6 +460,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Container(
                   width: size.width * 0.8,
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
