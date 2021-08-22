@@ -385,8 +385,9 @@ class _MyHomePageState extends State<MyHomePage> {
   _afterLayout(_) {
     setState(() {
       sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox;
-      staticMoveX = sizeGrid.size.width * 0.2;
-      staticMoveY = sizeGrid.size.width * 0.2;
+      //resiponsive
+      staticMoveX = sizeGrid.size.width == 400 ? sizeGrid.size.width * 0.2: sizeGrid.size.width * 0.199;
+      staticMoveY = sizeGrid.size.width == 400 ? sizeGrid.size.width * 0.2: sizeGrid.size.width * 0.199;
     });
     print(sizeGrid.size);
   }
@@ -481,11 +482,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                           : template == "GOGOGO"
                               ? Image.asset("assets/images/start-button.png",
-                                  width: 80)
+                                  width: size.height *0.1)
                               : template == "letgo"
                                   ? Image.asset(
                                       "assets/images/crown.png",
-                                      width: 80,
+                                      width: size.height * 0.1,
                                     )
                                   : Text("$template"))
               : Text("")),
@@ -548,7 +549,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.all(Radius.circular(3))),
             child: Center(
               child: Image.asset(
-                "assets/images/question-mark.png",
+                "assets/images/round-bomb.png",
                 color: Colors.red,
                 width: 25,
               ),
