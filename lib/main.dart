@@ -34,111 +34,39 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final data = [
-    {
-      "index": 0,
-      "boom": false,
-    },
-    {
-      "index": 1,
-      "boom": false,
-    },
-    {
-      "index": 2,
-      "boom": false,
-    },
-    {
-      "index": 3,
-      "boom": false,
-    },
-    {
-      "index": 4,
-      "boom": false,
-    },
-    {
-      "index": 5,
-      "boom": false,
-    },
-    {
-      "index": 6,
-      "boom": false,
-    },
-    {
-      "index": 7,
-      "boom": false,
-    },
-    {
-      "index": 8,
-      "boom": false,
-    },
-    {
-      "index": 9,
-      "boom": false,
-    },
-    {
-      "index": 10,
-      "boom": false,
-    },
-    {
-      "index": 11,
-      "boom": false,
-    },
-    {
-      "index": 12,
-      "boom": false,
-    },
-    {
-      "index": 13,
-      "boom": false,
-    },
-    {
-      "index": 14,
-      "boom": false,
-    },
-    {
-      "index": 15,
-      "boom": false,
-    },
-    {
-      "index": 16,
-      "boom": false,
-    },
-    {
-      "index": 17,
-      "boom": false,
-    },
-    {
-      "index": 18,
-      "boom": false,
-    },
-    {
-      "index": 19,
-      "boom": false,
-    },
-    {
-      "index": 20,
-      "boom": false,
-    },
-    {
-      "index": 21,
-      "boom": false,
-    },
-    {
-      "index": 22,
-      "boom": false,
-    },
-    {
-      "index": 23,
-      "boom": false,
-    },
-    {
-      "index": 24,
-      "boom": false,
-    }
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
   ];
 
   final genGame = ["right", "left", "up", "down"];
 
+  // quiz
   List<int> genedGame = [];
+  List<int> positionGreen = []; //ตำแหน่งที่ไม่มีระเบิด
+  int nowPositon = 12;
   // index ไว้ แสดง quiz ใน array
   int index = 0;
   String template = "";
@@ -173,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       gameStart = true;
       genedGame = [];
+      positionGreen = [];
       index = 0;
       step = 0;
       level += 1;
@@ -189,47 +118,78 @@ class _MyHomePageState extends State<MyHomePage> {
     int random = Random().nextInt(genGame.length);
     // แก้บัคโดยการ ถ้า แกน x หรือ แกน y ออกนอกที่กำหนดแล้วจะให้ทำตรงกันข้าม
     switch (random) {
+      //ขวา
       case 0:
         setState(() {
           x += 1;
+          //  กำหนดตำแหน่ง
+          nowPositon += 1;
+          positionGreen.add(nowPositon);
         });
         if (x > 2) {
           setState(() {
             random = 1;
             x -= 2;
+            //กำหนดต่ำแหน่ง
+            positionGreen.removeLast();
+            nowPositon -= 2;
+            positionGreen.add(nowPositon);
           });
         }
         break;
+      // ซ้าย
       case 1:
         setState(() {
           x -= 1;
+          //  กำหนดตำแหน่ง
+          nowPositon -= 1;
+          positionGreen.add(nowPositon);
         });
         if (x < -2) {
           setState(() {
             random = 0;
             x += 2;
+            //กำหนดต่ำแหน่ง
+            positionGreen.removeLast();
+            nowPositon += 2;
+            positionGreen.add(nowPositon);
           });
         }
         break;
+      // ขึ้น
       case 2:
         setState(() {
           y -= 1;
+          //  กำหนดตำแหน่ง
+          nowPositon -= 5;
+          positionGreen.add(nowPositon);
         });
         if (y < -2) {
           setState(() {
             random = 3;
             y += 2;
+            //กำหนดต่ำแหน่ง
+            positionGreen.removeLast();
+            nowPositon += 10;
+            positionGreen.add(nowPositon);
           });
         }
         break;
       case 3:
         setState(() {
           y += 1;
+          //  กำหนดตำแหน่ง
+          nowPositon += 5;
+          positionGreen.add(nowPositon);
         });
         if (y > 2) {
           setState(() {
             random = 2;
             y -= 2;
+            //กำหนดต่ำแหน่ง
+            positionGreen.removeLast();
+            nowPositon -= 10;
+            positionGreen.add(nowPositon);
           });
         }
         break;
@@ -246,7 +206,8 @@ class _MyHomePageState extends State<MyHomePage> {
     for (var i = 0; i < level; i++) {
       checkOutOfCard();
     }
-    print(genedGame);
+    print("quiz game : $genedGame");
+    print("position : $positionGreen");
 
     // ทำการบอก player ว่าให้เดินไปทางไหนแล้วจำเอา
     for (var i = 0; i < genedGame.length; i++) {
@@ -324,11 +285,11 @@ class _MyHomePageState extends State<MyHomePage> {
     if (move == genGame[genedGame[step]]) {
       setState(() {
         template = "nice";
-        step += 1;
       });
       await Future.delayed(Duration(milliseconds: 500));
       setState(() {
         template = "";
+        step += 1;
       });
       if (step == genedGame.length) {
         setState(() {
@@ -372,6 +333,8 @@ class _MyHomePageState extends State<MyHomePage> {
       x = 0;
       y = 0;
       level = 1;
+      nowPositon = 12;
+      positionGreen = [];
     });
     print("game over");
   }
@@ -386,8 +349,12 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox;
       //resiponsive
-      staticMoveX = sizeGrid.size.width == 400 ? sizeGrid.size.width * 0.2: sizeGrid.size.width * 0.199;
-      staticMoveY = sizeGrid.size.width == 400 ? sizeGrid.size.width * 0.2: sizeGrid.size.width * 0.199;
+      staticMoveX = sizeGrid.size.width == 400
+          ? sizeGrid.size.width * 0.2
+          : sizeGrid.size.width * 0.199;
+      staticMoveY = sizeGrid.size.width == 400
+          ? sizeGrid.size.width * 0.2
+          : sizeGrid.size.width * 0.199;
     });
     print(sizeGrid.size);
   }
@@ -482,7 +449,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             )
                           : template == "GOGOGO"
                               ? Image.asset("assets/images/start-button.png",
-                                  width: size.height *0.1)
+                                  width: size.height * 0.1)
                               : template == "letgo"
                                   ? Image.asset(
                                       "assets/images/crown.png",
@@ -531,11 +498,11 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          back: Container(
+          back: positionGreen.length > 0 ? Container(
             decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
-                  color: Colors.red,
+                  color: positionGreen[step] == index ? Colors.yellow : Colors.red,
                   width: 5,
                 ),
                 boxShadow: [
@@ -549,12 +516,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 borderRadius: BorderRadius.all(Radius.circular(3))),
             child: Center(
               child: Image.asset(
-                "assets/images/round-bomb.png",
-                color: Colors.red,
+                positionGreen[step] == index ? "assets/images/c.png"  :"assets/images/round-bomb.png",
+                color: positionGreen[step] == index ? Colors.yellow : Colors.red,
                 width: 25,
               ),
             ),
-          ),
+          ):Text(''),
         );
       },
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
