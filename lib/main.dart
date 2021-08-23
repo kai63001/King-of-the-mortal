@@ -247,7 +247,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (onCheckPress == true) {
       return;
     }
-    // print(detail.delta.dy);
+
+    // ตรวจสอบ แกน x และ y ห้ามออกจากที่กำหนด
     if (detail.delta.dx > sensitivity &&
         characterPositionX < (staticMoveX * 2)) {
       // print("right");
@@ -283,6 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  // ตรวจสอบ ระเบิด
   void checkBomb(move) async {
     flipCard();
     await Future.delayed(Duration(seconds: 2));
@@ -311,6 +313,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+
+  // animation flip card all
   void flipCard() async {
     await Future.delayed(Duration(seconds: 1));
     player.play('assets/sound/flipcard.mp3');
