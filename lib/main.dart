@@ -33,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  // ข้อมูล card เอาไว้ loop เฉยๆ
   final data = [
     false,
     false,
@@ -61,6 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
     false,
   ];
 
+  // กำหนด 0-3 เป็นอะไรของ array
   final genGame = ["right", "left", "up", "down"];
 
   // sound
@@ -69,9 +71,12 @@ class _MyHomePageState extends State<MyHomePage> {
   // quiz
   List<int> genedGame = [];
   List<int> positionGreen = []; //ตำแหน่งที่ไม่มีระเบิด
+  // ตำแหน่งปัจจุบันของตัวละคร player
   int nowPositon = 12;
   // index ไว้ แสดง quiz ใน array
   int index = 0;
+
+  //ข้อความไว้แสดง
   String template = "";
 
   bool gameStart = false;
@@ -121,6 +126,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // 1 = ซ้าย
     // 2 = ขึ้น
     // 3 = ลง
+    // =========== //
+    // ขึ้น position จะ -5
+    // ลง position จะ +5
+    // ซ้าย -1 
+    // ขวา +1
     int random = Random().nextInt(genGame.length);
     // แก้บัคโดยการ ถ้า แกน x หรือ แกน y ออกนอกที่กำหนดแล้วจะให้ทำตรงกันข้าม
     switch (random) {
@@ -286,10 +296,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // ตรวจสอบ ระเบิด
   void checkBomb(move) async {
-    flipCard();
+    flipCard(); //เรียก ใช้ func flipCard();
     await Future.delayed(Duration(seconds: 2));
     print(move);
     print(genGame[genedGame[step]]);
+    // ทำการตรวจ ว่าเดินถูกทางไหม
     if (move == genGame[genedGame[step]]) {
       setState(() {
         template = "nice";
@@ -299,6 +310,7 @@ class _MyHomePageState extends State<MyHomePage> {
         template = "";
         step += 1;
       });
+      // ตรวจสอบว่า จบ ด่านหรือยัง จะ ทำการเริ่มเกมใหม่โดยการ + level ไปเรื่อยๆ
       if (step == genedGame.length) {
         setState(() {
           template = "letgo";
@@ -307,6 +319,7 @@ class _MyHomePageState extends State<MyHomePage> {
         startGame();
         return;
       }
+      // เริ่ม ขยับ
       startMove();
     } else {
       gameOver();
@@ -316,15 +329,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // animation flip card all
   void flipCard() async {
-    await Future.delayed(Duration(seconds: 1));
-    player.play('assets/sound/flipcard.mp3');
+    await Future.delayed(Duration(seconds: 1)); //delay 1 วิ
+    player.play('assets/sound/flipcard.mp3'); // เปิด sound effect flipcard
+    // ทำการเปิด card ทั้งหมด
     for (int i = 0; i < data.length; i++) {
       cardKeys[i]?.currentState?.toggleCard();
     }
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 1)); //delay 1 วิ
+    // ตรวจสอบว่า จบ เกมหรือไหม ถ้าจบ จะไม่เปิด sound flip card
     if (checkGameOver == false) {
       player.play('assets/sound/flipcard.mp3');
     }
+    // ทำการเปิด card ทั้งหมด
     for (int i = 0; i < data.length; i++) {
       cardKeys[i]?.currentState?.toggleCard();
     }
@@ -333,7 +349,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //แพ้
   void gameOver() {
-    player.play('assets/sound/gameover.wav');
+    player.play('assets/sound/gameover.wav'); // เปิด sound จบเกม
+    // reset ค่าทุกอย่างเป็น default
     setState(() {
       gameStart = false;
       genedGame = [];
@@ -355,14 +372,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback(_afterLayout);
+    WidgetsBinding.instance!.addPostFrameCallback(_afterLayout); //ถ้า widget ทำงานเรียน funtion afterLayout
     super.initState();
   }
 
+  // function เกียวกับการ resiponsive โดยการ ดึง key จาก container
   _afterLayout(_) {
     setState(() {
-      sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox;
-      //resiponsive
+      sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox; // as RenderBox ไม่ใส่ไม่ทำงาน
+      //resiponsive การ ขยับ ของ player
       staticMoveX = sizeGrid.size.width == 400
           ? sizeGrid.size.width * 0.2
           : sizeGrid.size.width * 0.199;
@@ -375,6 +393,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    //get resiponsive screnn size
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
@@ -432,6 +451,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // ลูกศร และ ui ต่างๆบนหัว
   Positioned arrowQuiz(Size size) {
+    // ใช้การหมุนของ รูปภาพแทนการใช้ ลูกศร หลายๆอัน
     double calAnge = template == "right"
         ? Math.pi / 2
         : template == "left"
@@ -512,11 +532,13 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
+          // ถ้าarray postionGreen มีแล้ว จะทำงาน (ไม่ได้แยกหลาย หน้ามันเลยต้องทำ)
           back: positionGreen.length > 0
               ? Container(
                   decoration: BoxDecoration(
                       color: Colors.white,
                       border: Border.all(
+                        //ตรวจสอบ ตำแหน่ง position ที่ ไม่มีระเบิด ถ้าไม่มีจะเป็น สีเหลือง ถ้ามีจะเป็น สีแดง
                         color: positionGreen[step] == indexCard
                             ? Colors.yellow
                             : Colors.red,
@@ -546,6 +568,7 @@ class _MyHomePageState extends State<MyHomePage> {
               : Text(''),
         );
       },
+      //spacing
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 5, crossAxisSpacing: 5, mainAxisSpacing: 5),
     );
@@ -564,6 +587,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Colors.blue,
           ],
         )),
+        // ใช้ ListView แทน columns กับ overflow error
         child: ListView(
           children: [
             Container(
@@ -584,6 +608,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // ถ้า game over จะแสดง game over แทน ชื่อเกม
                     checkGameOver
                         ? Text(
                             "GAME OVER",
