@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import 'dart:math' as Math;
 
 void main() {
@@ -62,6 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
   ];
 
   final genGame = ["right", "left", "up", "down"];
+
+  // sound
+  AudioPlayer player = AudioPlayer();
 
   // quiz
   List<int> genedGame = [];
@@ -298,6 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
         setState(() {
           template = "letgo";
         });
+        player.play('assets/sound/point.wav');
         startGame();
         return;
       }
@@ -312,10 +316,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void flipCard() async {
     await Future.delayed(Duration(seconds: 1));
+    player.play('assets/sound/flipcard.mp3');
     for (int i = 0; i < data.length; i++) {
       cardKeys[i]?.currentState?.toggleCard();
     }
     await Future.delayed(Duration(seconds: 1));
+    if (checkGameOver == false) {
+      player.play('assets/sound/flipcard.mp3');
+    }
     for (int i = 0; i < data.length; i++) {
       cardKeys[i]?.currentState?.toggleCard();
     }
@@ -324,6 +332,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   //แพ้
   void gameOver() {
+    player.play('assets/sound/gameover.wav');
     setState(() {
       gameStart = false;
       genedGame = [];
@@ -574,20 +583,21 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    checkGameOver?Text(
-                      "GAME OVER",
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.fredokaOne(
-                          textStyle:
-                              TextStyle(color: Colors.redAccent, fontSize: 35)),
-                    ):
-                    Text(
-                      "King of the mortal",
-                      textAlign: TextAlign.left,
-                      style: GoogleFonts.fredokaOne(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 35)),
-                    ),
+                    checkGameOver
+                        ? Text(
+                            "GAME OVER",
+                            textAlign: TextAlign.left,
+                            style: GoogleFonts.fredokaOne(
+                                textStyle: TextStyle(
+                                    color: Color(0xfffd5f7e), fontSize: 35)),
+                          )
+                        : Text(
+                            "King of the mortal",
+                            textAlign: TextAlign.left,
+                            style: GoogleFonts.fredokaOne(
+                                textStyle: TextStyle(
+                                    color: Colors.white, fontSize: 35)),
+                          ),
                     Text(
                       "Memorise the arrows shown each round and move to dodge the explosions",
                       textAlign: TextAlign.left,
@@ -624,8 +634,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Text(
-                      checkGameOver ? "TRY AGAIN":
-                      "START GAME",
+                      checkGameOver ? "TRY AGAIN" : "START GAME",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.fredokaOne(
                           textStyle: TextStyle(color: Colors.blue)),
