@@ -73,6 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool gameStart = false;
   bool onCheckPress = true;
+  // เมื่อแพ้เกม
+  bool checkGameOver = false;
 
   double characterPositionX = 0;
   double characterPositionY = 0;
@@ -105,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
       index = 0;
       step = 0;
       level += 1;
+      checkGameOver = false;
     });
     generateGame();
   }
@@ -335,6 +338,7 @@ class _MyHomePageState extends State<MyHomePage> {
       level = 1;
       nowPositon = 12;
       positionGreen = [];
+      checkGameOver = true;
     });
     print("game over");
   }
@@ -467,9 +471,9 @@ class _MyHomePageState extends State<MyHomePage> {
       // แก้ grid ไม่ให้มัน scroll ซึงมันไม่ scroll อยู่แล้ว แกน y เลยไม่ทำงาน เห้อออ
       physics: NeverScrollableScrollPhysics(),
       itemCount: data.length,
-      itemBuilder: (context, index) {
-        cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
-        GlobalKey<FlipCardState>? thisCard = cardKeys[index];
+      itemBuilder: (context, indexCard) {
+        cardKeys.putIfAbsent(indexCard, () => GlobalKey<FlipCardState>());
+        GlobalKey<FlipCardState>? thisCard = cardKeys[indexCard];
         return FlipCard(
           flipOnTouch: false,
           direction: FlipDirection.HORIZONTAL,
@@ -498,30 +502,38 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          back: positionGreen.length > 0 ? Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(
-                  color: positionGreen[step] == index ? Colors.yellow : Colors.red,
-                  width: 5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: Offset(0, 0),
+          back: positionGreen.length > 0
+              ? Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(
+                        color: positionGreen[step] == indexCard
+                            ? Colors.yellow
+                            : Colors.red,
+                        width: 5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 1,
+                          offset: Offset(0, 0),
+                        ),
+                      ],
+                      borderRadius: BorderRadius.all(Radius.circular(3))),
+                  child: Center(
+                    child: Image.asset(
+                      positionGreen[step] == indexCard
+                          ? "assets/images/c.png"
+                          : "assets/images/round-bomb.png",
+                      color: positionGreen[step] == indexCard
+                          ? Colors.yellow
+                          : Colors.red,
+                      width: 25,
+                    ),
                   ),
-                ],
-                borderRadius: BorderRadius.all(Radius.circular(3))),
-            child: Center(
-              child: Image.asset(
-                positionGreen[step] == index ? "assets/images/c.png"  :"assets/images/round-bomb.png",
-                color: positionGreen[step] == index ? Colors.yellow : Colors.red,
-                width: 25,
-              ),
-            ),
-          ):Text(''),
+                )
+              : Text(''),
         );
       },
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -605,6 +617,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Text(
+                      checkGameOver ? "TRY AGAIN":
                       "START GAME",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.fredokaOne(
