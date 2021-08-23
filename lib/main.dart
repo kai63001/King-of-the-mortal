@@ -574,6 +574,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    checkGameOver?Text(
+                      "GAME OVER",
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.fredokaOne(
+                          textStyle:
+                              TextStyle(color: Colors.redAccent, fontSize: 35)),
+                    ):
                     Text(
                       "King of the mortal",
                       textAlign: TextAlign.left,
