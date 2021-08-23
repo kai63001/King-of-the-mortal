@@ -308,9 +308,6 @@ class _MyHomePageState extends State<MyHomePage> {
       startMove();
     } else {
       gameOver();
-      setState(() {
-        template = "noob";
-      });
     }
   }
 
