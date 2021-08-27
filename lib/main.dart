@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
     // =========== //
     // ขึ้น position จะ -5
     // ลง position จะ +5
-    // ซ้าย -1 
+    // ซ้าย -1
     // ขวา +1
     int random = Random().nextInt(genGame.length);
     // แก้บัคโดยการ ถ้า แกน x หรือ แกน y ออกนอกที่กำหนดแล้วจะให้ทำตรงกันข้าม
@@ -326,7 +326,6 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-
   // animation flip card all
   void flipCard() async {
     await Future.delayed(Duration(seconds: 1)); //delay 1 วิ
@@ -372,14 +371,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback(_afterLayout); //ถ้า widget ทำงานเรียน funtion afterLayout
+    WidgetsBinding.instance!.addPostFrameCallback(
+        _afterLayout); //ถ้า widget ทำงานเรียน funtion afterLayout
     super.initState();
   }
 
   // function เกียวกับการ resiponsive โดยการ ดึง key จาก container
   _afterLayout(_) {
     setState(() {
-      sizeGrid = _stickyKey.currentContext!.findRenderObject() as RenderBox; // as RenderBox ไม่ใส่ไม่ทำงาน
+      sizeGrid = _stickyKey.currentContext!.findRenderObject()
+          as RenderBox; // as RenderBox ไม่ใส่ไม่ทำงาน
       //resiponsive การ ขยับ ของ player
       staticMoveX = sizeGrid.size.width == 400
           ? sizeGrid.size.width * 0.2
