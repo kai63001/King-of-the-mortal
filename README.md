@@ -17,10 +17,10 @@ Simple game made with flutter Memorise the arrows shown each round and move to d
 Note: You already need to have Flutter installed.
 <pre>
 # clone the repo
-git clone https://github.com/kai63001/covid19flutter.git 
+git clone https://github.com/kai63001/King-of-the-mortal.git 
 
 # move to the cloned repo
-cd flutter-movies-app
+cd King-of-the-mortal
 
 # get dependencies
 flutter pub get
